@@ -19,18 +19,13 @@ const CartProvider = ( { children } ) => {
   
   //get cookie
   const [view, setview] = useState('')
-  const getCookie = (name) => {
-    const value = `; ${document.cookie}`;
+  const getLocal = (name) => {
+    const value = localStorage.getItem(name)
     console.log(value);
     
-    const parts = value.split(`; ${name}=`);
-      console.log(parts);
-    
-      if (parts.length === 2) {
-          console.log(parts.pop().split(';').shift());
-          
-          return parts.pop().split(';').shift();
-      }
+    if (value != null) {  
+      return value
+    }
     return null;
   }
   //obtener estados
@@ -1013,7 +1008,7 @@ const CartProvider = ( { children } ) => {
   return (
       // aca llamamos al hoock useMiContexto
       <MiContexto.Provider value={{
-        getCookie, view, setview,
+        getLocal, view, setview,
 
         getEstados, estados, setEstados,
 

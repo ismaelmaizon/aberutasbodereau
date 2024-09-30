@@ -23,7 +23,7 @@ const MenuProps = {
 export default function Productos() {
 
     const {
-        getCookie, setview, view, 
+        getLocal, setview, view, 
         getTipos, tipos,
         setVprod, setVent,
         lugares, getLugares,
@@ -100,7 +100,7 @@ export default function Productos() {
         })
         setRows(prods)
         setids(ids)
-        const userView = getCookie('_UrB');
+        const userView = getLocal('view');
         console.log(userView);
         
         setview(userView)

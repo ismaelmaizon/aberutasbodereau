@@ -9,16 +9,19 @@ import AddIcon from '@mui/icons-material/Add';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
 import AddLocationIcon from '@mui/icons-material/AddLocation';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
+import LogoutIcon from '@mui/icons-material/Logout';
 //import Link from '@mui/material/Link';
 import { Link } from 'react-router-dom';
 import { MiContexto } from '../context/context';
+import { useNavigate } from 'react-router-dom';
 
+const URL = import.meta.env.VITE_BACKEND_URL
 
 
 export default function NavBar() {
 
     const { cart } = useContext(MiContexto)
-
+    const router = useNavigate()
     //despliegue getProductosLugar
     const [state, setState] = useState({
       top: false,
@@ -100,6 +103,27 @@ export default function NavBar() {
             <Button sx={{color: 'white'}}>
                 <AddShoppingCartIcon/> {cart.length}
             </Button>
+            <Button sx={{color: 'white'}} onClick={ async () =>{
+              try {
+                const response = await fetch(`http://${URL}/api/logins/logout`, {
+                  method: 'GET',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  credentials: 'include'
+                });
+                if (response.status != 401) {
+                  router('/inicio')
+
+                }else{
+                  console.log(response);
+                  router('/')
+                }
+                console.log(response.status);                    
+              } catch (error) {
+                console.error('There was a problem with the fetch operation:', error);
+              }
+            } } > <LogoutIcon/> </Button>
           </Link>
         </Toolbar>
       </AppBar>

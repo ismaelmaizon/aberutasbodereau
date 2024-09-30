@@ -16,7 +16,7 @@ import NavBar from "../navbar/navBar";
 
 export default function Inicio() {
     const {
-        getCookie, setview, view,
+        getLocal, setview, view,
         getEstados,
         getTipos,
         vprod, setVprod, vent, setVent,
@@ -38,7 +38,7 @@ export default function Inicio() {
         })
         setInfoprod(info)    
         // Usar la función para obtener una cookie llamada "miCookie"
-        const userView = getCookie('_UrB');
+        const userView = getLocal('view');
         console.log(userView);
         
         setview(userView)

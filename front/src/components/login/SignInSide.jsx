@@ -132,6 +132,9 @@ export default function SignInSide() {
                       });
                     }else{
                       console.log(response);
+                      const data = await response.json();
+                      console.log(data);
+                      localStorage.setItem('view', data.response)
                       router('/inicio')
                     }
                     console.log(response.status);                    

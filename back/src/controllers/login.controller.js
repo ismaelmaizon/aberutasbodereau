@@ -55,21 +55,13 @@ export const login = async (req, res) => {
         console.log(token);
         const cookiesOptions = {
             maxAge: 21600000, 
-            httpOnly: false,
-            secure: true,
-            sameSite: 'none'
+            httpOnly: true    
         }
         res.cookie('jwt', token, cookiesOptions)
-        res.cookie('_UrB', tockenRol, {
-            maxAge: 21600000,
-            httpOnly: false,
-            secure: true,
-            sameSite: 'none'
-        })
-        res.send({status: 200, message: 'hola'})
+        res.send({status: 200, message: 'Bien venido', response: tockenRol})
     }catch(err){
         console.log(err);
-        res.status(500).json({message: 'usuario no entonctrado'} )
+        res.status(500).json({message: 'usuario no encontrado'} )
 
     }
 };
@@ -78,7 +70,6 @@ export const login = async (req, res) => {
 export const autenticacion = async (req, res, next) => {
     console.log('cookies');
     console.log(req.cookies.jwt);
-    console.log(req.cookies._UrB);
     if(req.cookies.jwt){
         try{
             const decodificar = await util.promisify(jwt.verify)(req.cookies.jwt, 'decoSecret')
@@ -94,11 +85,17 @@ export const autenticacion = async (req, res, next) => {
             res.status(401).json({message: 'problemas con la verificacion del token'})
         }
     }else{
-        res.status(401).json({message: 'coockie vencida3'})
+        res.status(401).json({message: 'coockie vencida'})
     }
 };
 
 
 export const logout = async (req, res) =>{
-    res.clearCookie('jwl').status(401).json({message: 'Logout'})
+    console.log(req.cookies.jwt);
+    const cookiesOptions = {
+        maxAge: 2, 
+        httpOnly: true    
+    }
+    res.cookie('jwt', '', cookiesOptions)    
+    res.status(401).json({ message: 'Logout successful' }); 
 }
