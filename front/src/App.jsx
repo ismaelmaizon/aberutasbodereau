@@ -15,6 +15,7 @@ import PorductDetail from './components/productDetail/productDetail.jsx'
 import AddTipo from './components/addtipo/addtipo.jsx'
 import AddLugar from './components/addlugar/addlugar.jsx'
 import UpdateVenta from './components/updateVentas/updateVenta.jsx'
+import UpDateProduct from './components/updateProduct/updateProduct.jsx'
 
 
 function App() {
@@ -36,6 +37,7 @@ function App() {
                 <Route element={<Dashboard/>} path='/dashboard' ></Route>
                 <Route element={<PorductDetail/>} path='/detalle' ></Route>
                 <Route element={<UpdateVenta/>} path='/updateVenta' ></Route>
+                <Route element={<UpDateProduct/>} path='/updateProduct' ></Route>
               </Routes>
             </div>
         </CartProvider>

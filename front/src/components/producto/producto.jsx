@@ -68,7 +68,7 @@ export default function Producto() {
                                     <Link to='/addproductLug' >
                                         <Button size="small" color="info" variant="contained" onClick={ async ()=>{
                                             setIdg(producto.IdGenerate)
-                                        }} >agaregara a lugar</Button>
+                                        }} >agregar a lugar</Button>
                                     </Link>
                                 </Grid>
                                 <Grid item xs={6}>

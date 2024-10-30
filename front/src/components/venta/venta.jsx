@@ -28,7 +28,6 @@ export default function Venta() {
                             > Original
                             <Text style={{color: 'black', fontSize: '10px' }}> Original </Text>
                     </View>
-                    
                     <View style={{ 
                             display: 'flex', flexDirection: "row", alignSelf: "flex-start", justifyContent: "space-around",
                             }}

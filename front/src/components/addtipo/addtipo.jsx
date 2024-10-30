@@ -47,6 +47,12 @@ export default function AddTipo () {
                     </Grid>      
             <Grid container direction='row' sx={{ width:'500px', margin: 'auto' }} spacing={5} >
                     <Grid item xs={6}  >
+                            <Button type="submit" variant="contained" size="small" sx={{ width:'200px'}} onClick={()=>{
+                                refresh()
+                                router('/inicio')
+                            }}>volver</Button>
+                        </Grid>
+                    <Grid item xs={6}  >
                     <Button type="submit" variant="contained" size="small" sx={{ width:'200px', margin: 'auto' }} onClick={ async ()=>{
                         console.log(data);
                         let respon = await createTipo(data)
@@ -57,12 +63,6 @@ export default function AddTipo () {
                             router('/inicio')
                         }
                     }}  >crear</Button>
-                    </Grid>
-                    <Grid item xs={6}  >
-                        <Button type="submit" variant="contained" size="small" sx={{ width:'200px'}} onClick={()=>{
-                            refresh()
-                            router('/inicio')
-                        }}>volver</Button>
                     </Grid>
                 </Grid>
             </Box>

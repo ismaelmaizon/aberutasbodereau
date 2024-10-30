@@ -26,7 +26,6 @@ export const getProducto = async (req, res) => {
     if (rows.length <= 0) {
       return res.status(404).json({ message: "producto not found" });
     }
-
     res.json(rows[0]);
   } catch (error) {
     return res.status(500).json({ message: "Something goes wrong" });
@@ -70,6 +69,42 @@ export const createProducto = async (req, res) => {
     return res.status(500).json({ message: "Something goes wrong" });
   }
 };
+//Update producto
+export const updateProducto = async (req, res) => {
+  const {IdGenerate, Tipo, Ancho, Alto, Izq, Derc, Precio_U } = req.body
+  console.log(IdGenerate, Tipo, Ancho, Alto, Izq, Derc, Precio_U);
+  const query = `
+  UPDATE productos
+  SET Tipo = ?, Ancho = ?, Alto = ?, Izq = ?, Derc = ?, Precio_U = ?
+  WHERE IdGenerate = ?
+  `;  
+  
+  try {
+    const [rows] = await pool.query("SELECT * FROM productos WHERE IdGenerate = ?", [
+      IdGenerate,
+    ]);
+
+    if(rows.length != 0){
+      try{
+        const [update] = await pool.query(query,[
+          Tipo, Ancho, Alto, Izq, Derc, Precio_U, IdGenerate]
+        );
+        if (update) { 
+          return res.status(200).json({ message: "producto actualizado" });
+        }
+      }catch(err){
+        return res.status(400).json({ message: "problemas al actualizar producto" });
+      }
+
+    }else{
+      return res.status(400).json({ message: "producto no existe" });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "problemas para encontrar producto" });
+  }
+};
+
 //ver imagenes del producto
 export const getProductoIms = async (req, res) => {
   try {
@@ -110,19 +145,64 @@ export const addImgProducto = async (req, res) => {
 
 export const deleteProducto = async (req, res) => {
   //delete FROM lugaresProducto where id_producto = 1;
+  let boolLugProd = false
+  let boolImgProd = false
+  
   try {
     const { id } = req.params;
-    console.log(id);
-    const [rowsl] = await pool.query("DELETE FROM lugaresProducto where id_producto = ?", [
+    const [product] = await pool.query("SELECT * FROM productos WHERE id = ?", [
       id,
     ]);
-
-    if (rowsl) {
-      const [rowsp] = await pool.query("DELETE FROM productos where id = ?", [
+    console.log(product);
+    //verificar existencia
+    if (product.length == 0) {
+      return res.status(404).json({ message: "product not found" });
+    }
+    //verificar existencia en lugares
+    try{
+      const [lugProd] = await pool.query("delete FROM lugaresProducto where id_producto = ?", [
         id,
       ]);
-      rowsp ? res.send( {status: 200, message: 'succes', response: rowsp} ) :  res.send( {status: 400, message: 'problemas al eliminar'} )
+      if (lugProd.affectedRows >= 0) {
+        boolLugProd = true
+      }
+    }catch(err){
+      console.log(err);
+      return res.status(500).json({ message: "problemas al eliminar producto de lugares" });
     }
+
+    try{
+      //verificar existencia de imagenes
+      const [imgProd] = await pool.query("delete FROM imagenes where IdProduct = ?", [
+        product[0].IdGenerate,
+      ]);
+      if (imgProd.affectedRows >= 0) {
+        boolImgProd = true
+      }
+    }catch(err){
+      console.log(err);
+      return res.status(500).json({ message: "problemas al eliminar imagenes del producto" });
+    }
+    
+    if (boolImgProd && boolLugProd) {
+      try{
+        const [rows] = await pool.query("delete FROM productos where id = ?", [
+          id,
+        ])
+        if (rows){
+          return res.status(200).json({ message: "producto eliminado completamente" });
+        }
+      }catch(err){
+        console.log(err);
+        return res.status(500).json({ message: "problemas al eliminar producto" });
+      }
+    }else{
+      console.log(boolImgProd);
+      console.log(boolLugProd);
+      
+      return res.status(500).json({ message: "problemas al eliminar alguna informacion del producto" });
+    }
+
   } catch (error) {
     console.log(error);
     

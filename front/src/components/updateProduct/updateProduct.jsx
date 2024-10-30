@@ -1,5 +1,5 @@
 import { Box, Button, Grid, MenuItem, TextField, Typography } from "@mui/material";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { MiContexto } from "../context/context";
 import { useNavigate } from "react-router-dom";
 import NavBar from "../navbar/navBar";
@@ -7,18 +7,18 @@ import NavBar from "../navbar/navBar";
 
 
 
-export default function AddProducto () {
+export default function UpDateProduct () {
 
-    const {tipos, createProducto, alert} = useContext(MiContexto)
+    const {tipos, producto, actualizarProducto, alert} = useContext(MiContexto)
 
     const router = useNavigate()
-    const [file, setFile] = useState(null)
     const [data, setData] = useState({
-        Tipo: '',
-        Alto: '',
-        Ancho: '',
+        IdGenerate: producto.IdGenerate,
+        Tipo: producto.Tipo,
+        Alto: producto.Alto,
+        Ancho: producto.Ancho,
         Lado: '',
-        Precio_U: 0,
+        Precio_U: producto.Precio_U,
     });
 
     const lado = [
@@ -30,11 +30,6 @@ export default function AddProducto () {
         }
     ];
 
-    const handleFileChange = (event) => {
-        const file = event.target.files[0]; // Obtén el primer archivo seleccionado
-        setFile(file)
-        console.log('Archivo seleccionado:', file);
-    };
 
     const dataFrom = async (event) => {
         event.preventDefault()      
@@ -46,19 +41,44 @@ export default function AddProducto () {
         console.log(data);
     }
 
+    useEffect(()=>{
+        console.log(producto);
+        console.log(tipos);
+        
+        if (producto.Derc == 0) {
+            setData({
+                IdGenerate: producto.IdGenerate,
+                Tipo: producto.Tipo,
+                Alto: producto.Alto,
+                Ancho: producto.Ancho,
+                Lado: 'Izq',
+                Precio_U: producto.Precio_U,
+            })
+        }else{
+            setData({
+                IdGenerate: producto.IdGenerate,
+                Tipo: producto.Tipo,
+                Alto: producto.Alto,
+                Ancho: producto.Ancho,
+                Lado: 'Derc',
+                Precio_U: producto.Precio_U,
+            })
+        }
+    },[])
+
 
     return(
         <div>
         <NavBar/>
         <Box sx={{ width: '60%', margin: 'auto', marginTop: '120px', padding: '15px', boxShadow: '2px 2px 10px 2px' }}  >
-            <Typography variant="h4" gutterBottom sx={{ width:'300px', margin: 'auto' }} >
-                Nuevo producto
+            <Typography variant="h5" gutterBottom sx={{ width:'450px', margin: 'auto' }} >
+                Modificando a {producto.IdGenerate}
             </Typography>
             <Box component='form' onSubmit={handleSubmit} encType="multipart/form-data" display={'flex'} flexDirection={'column'} >            
             <Grid container direction='row' marginBottom="40px" marginTop="10px">
                 <Grid item xs={10} container direction='row' spacing={3} sx={{ margin:'auto' }} >
                         <Grid item xs={6}>
-                        <TextField fullWidth select label='Tipo' name='Tipo' type="text" onChange={dataFrom}>
+                        <TextField fullWidth select label={`${tipos[producto.Tipo - 1].Tipo}`} name='Tipo' type="text"  onChange={dataFrom}>
                         {tipos.map((option, index) => (
                                 <MenuItem key={index} value={option.id}>
                                 {option.Tipo}
@@ -67,18 +87,38 @@ export default function AddProducto () {
                         </TextField>
                         </Grid>
                         <Grid item xs={6}>
-                        <TextField fullWidth label='Alto' name='Alto' type="text" onChange={dataFrom}></TextField>
+                        <TextField fullWidth label={`${data.Alto}`} name='Alto' type="text"  onChange={dataFrom}></TextField>
                         </Grid>
                         <Grid item xs={6}>
-                        <TextField fullWidth label='Ancho' name='Ancho' type="text" onChange={dataFrom}></TextField>
+                        <TextField fullWidth label={`${data.Ancho}`} name='Ancho' type="text" onChange={dataFrom}></TextField>
                         </Grid>
                         <Grid item xs={6}>
-                            <TextField
+                        {
+                            producto.Derc == 1 ? <TextField
+                            fullWidth
+                            sx={{height: '0px'}}
+                            id="outlined-select-currency"
+                            select
+                            label={`${lado[0].name}`}
+                            value={`${lado[0].name}`}
+                            name="Lado"
+                            helperText="Please select your lado"
+                            onChange={dataFrom}
+                            >
+                            {lado.map((option, index) => (
+                                <MenuItem key={index} value={option.name}>
+                                {option.name}
+                                </MenuItem>
+                            ))}
+                            </TextField> 
+                        :
+                                <TextField
                                 fullWidth
                                 sx={{height: '0px'}}
                                 id="outlined-select-currency"
                                 select
-                                label="Lado"
+                                label={`${lado[1].name}`}
+                                value={`${lado[1].name}`}
                                 name="Lado"
                                 helperText="Please select your lado"
                                 onChange={dataFrom}
@@ -88,33 +128,29 @@ export default function AddProducto () {
                                     {option.name}
                                     </MenuItem>
                                 ))}
-                            </TextField>
+                            </TextField> 
+                        }
+                            
                         </Grid>
                 </Grid>
                 <Grid item xs={10} container direction="row" spacing={3} sx={{ margin:'auto' }}>
                         <Grid item xs={6}>
-                            <TextField fullWidth label='Precio_U' name='Precio_U' type="text" onChange={dataFrom}></TextField>
+                            <TextField fullWidth label={`$ ${data.Precio_U}`} name='Precio_U' type="text" onChange={dataFrom}></TextField>
                         </Grid>
-                        <Grid item xs={6}>
-                        <input 
-                            type="file" 
-                            accept=".jpg, .jpeg, .png" 
-                            onChange={handleFileChange} 
-                            placeholder="ingresa imagen"
-                        />
-                        </Grid>
+                        
                 </Grid>
             </Grid>
             <Grid container direction ='row' sx={{ width:'500px', margin: 'auto' }} spacing={5} >
                     <Grid item xs={6}  >
-                        <Button type="submit" variant="contained" size="small" sx={{ width:'200px'}} onClick={()=>{
-                            router('/inicio')
-                        }}>volver</Button>
+                        <Button type="submit" variant="contained" size="small" sx={{ width:'200px', margin: 'auto' }}  onClick={ async ()=>{    
+                        router('/inicio')
+                        }} >volver</Button>
                     </Grid>
                     <Grid item xs={6}  >
                         <Button type="submit" variant="contained" size="small" sx={{ width:'200px', margin: 'auto' }} onClick={ async ()=>{
                             console.log(data);
-                            let respon = await createProducto(data, file)
+                            
+                            let respon = await actualizarProducto(data)
                             console.log(respon.status);
                             if (respon.status == 200) {
                                 await alert('success')
@@ -125,9 +161,10 @@ export default function AddProducto () {
                                 await alert('error')
                             }
 
-                        }}>crear</Button>
+                        }}>Modificar</Button>
                     </Grid>
                 </Grid>
+            
             </Box>
         </Box>
         </div>

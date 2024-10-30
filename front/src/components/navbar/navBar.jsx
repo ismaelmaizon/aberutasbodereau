@@ -114,9 +114,9 @@ export default function NavBar() {
                 });
                 if (response.status != 401) {
                   router('/inicio')
-
                 }else{
                   console.log(response);
+                  localStorage.clear()
                   router('/')
                 }
                 console.log(response.status);                    

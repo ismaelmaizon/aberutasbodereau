@@ -31,16 +31,18 @@ export default function Productos() {
         getProducto, setProducto, getVentas,
         filtrarTipoLadoLug, rows, setRows,
         refresh,
-        lug, setLug, lado, setLado, tipo, setTipo
+        lug, setLug, lado, setLado, tipo, setTipo, descr, setDescr,
+        alert
     } = useContext(MiContexto)
 
     const router = useNavigate()
-
+    
     //set lugares
     const handleChangeLug = (event) => {
         //console.log(event.target.value)
         setLug(event.target.value)
     }
+    
     //set lado
     const lados = ['Izq','Derc']    
     const handleChangeLado = (event) => {
@@ -52,12 +54,19 @@ export default function Productos() {
         setTipo(event.target.value)
     }
     //producto    
+    //set descripciones
+    const handleChangeDescr = (event) => {
+        console.log(event.target.innerText)
+        setDescr(event.target.innerText)
+    }
+    //producto    
     const [prod, setProd] = useState('')
     const handleChangeProd = (event) => {
         console.log(event.target.innerText)
         setProd(event.target.innerText)
     }
     const [ids, setids] = useState([])
+    const [descripciones, setDescripciones] = useState([])
 
     const columns = [
         { field: 'col0', headerName: 'ID', width: 150 },
@@ -77,6 +86,13 @@ export default function Productos() {
     useEffect(()=>{        
         let prods = []
         let ids = []
+        let descripcions = []
+        tipos.map((ti)=>{
+            let descripcion = { label: ti.Descripcion }
+            descripcions.push(descripcion)
+        })
+        setDescripciones(descripcions)
+
         productos.map((prod)=>{ 
             let id = { label: prod.IdGenerate }
             tipos.map((ti)=>{
@@ -102,9 +118,10 @@ export default function Productos() {
         setids(ids)
         const userView = getLocal('view');
         console.log(userView);
-        
         setview(userView)
         console.log(view);
+        console.log(tipos);
+        
         
     }, [])
 
@@ -133,7 +150,7 @@ export default function Productos() {
                 }}>ventas</Button>
                 <Button variant="contained"  sx={{width: '100px', height: '25px', padding: '20px' }} endIcon={<RotateLeftIcon />} onClick={()=>{refresh()}}>refresh</Button>
             </Grid>
-            <Grid sx={{ display: { xs: 'none', md: 'grid', gridTemplateColumns: `repeat(6, 1fr)`, alignItems:'center'},  gap: '5px' }} container>
+            <Grid sx={{ display: { xs: 'none', md: 'grid', gridTemplateColumns: `repeat(8, 1fr)`, alignItems:'center'},  gap: '5px' }} container>
                 <Grid item xs={6} >
                     <FormControl sx={{ marginTop: '10px' , width: '100%', paddingBottom: '10px'}}>
                                 <InputLabel id="demo-select-small-label" sx={{ fontSize: '15px' }} variant='outlined' size='small' >Tipo</InputLabel>
@@ -156,6 +173,19 @@ export default function Productos() {
                                 </Select>    
                     </FormControl>
                 </Grid>
+                <Grid item xs={6} >
+                    <FormControl sx={{ marginTop: '25px' , width: '100%',paddingBottom: '25px'}}>
+                    <Autocomplete
+                    disablePortal
+                    id="combo-box-demo"
+                    options={descripciones}
+                    style={{width: '250px', height: '45px'}}
+                    onChange={handleChangeDescr}
+                    renderInput={(params) => <TextField {...params} label="Descripcion" />}
+                    />  
+                    </FormControl>
+                                                 
+                </Grid>
                 <Grid item xs={6}>
                     <FormControl sx={{ marginTop: '10px' , width: '100%', paddingBottom: '10px'}}>
                                 <InputLabel id="demo-select-small-label" sx={{ fontSize: '15px' }} variant='outlined' size='small' >Lado</InputLabel>
@@ -177,7 +207,7 @@ export default function Productos() {
                                 ))}
                                 </Select>    
                     </FormControl>
-                </Grid>
+                </Grid>    
                 <Grid item xs={6}>
                     <FormControl sx={{ marginTop: '10px' , width: '100%', paddingBottom: '10px'}}>
                                 <InputLabel id="demo-select-small-label" sx={{ fontSize: '15px' }} variant='outlined' size='small'>Lugar</InputLabel>
@@ -201,14 +231,16 @@ export default function Productos() {
                     </FormControl>
                 </Grid>
                 <Grid item xs={6}>
-                    <Button variant="contained"  sx={{padding: '10px' }} endIcon={<SearchIcon />} onClick={ async ()=>{ 
-                        let prods = await filtrarTipoLadoLug(tipo, lado, lug) 
+                    <Button variant="contained"  sx={{padding: '10px' }} endIcon={<SearchIcon />} onClick={ async ()=>{
+                        console.log(descr);
+                        
+                        let prods = await filtrarTipoLadoLug(tipo, lado, lug, descr) 
                         if (prods.length != 0 ){
                             setRows(prods)
                         }else{
                             alert('error')
                         }
-                        }} >filtrar</Button>
+                        }}  >filtrar</Button>
                 </Grid>
                 <Grid item xs={6}>
                     <FormControl sx={{ marginTop: '25px' , width: '100%',paddingBottom: '25px'}}>
@@ -258,27 +290,32 @@ export default function Productos() {
                                     ))}
                                     </Select>    
                         </FormControl>
-                        <FormControl sx={{ marginTop: '25px', paddingBottom: '25px'}}>
-                                    <InputLabel id="demo-select-small-label">Lado</InputLabel>
-                                    <Select
-                                    sx={{height:'50px'}}
-                                    labelId="demo-select-small-label"
-                                    id="demo-select-small"
-                                    value={lado}
-                                    onChange={handleChangeLado}
-                                    MenuProps={MenuProps}
-                                    style={{width: '200px'}}
-                                    >
-                                    {lados.map((name, index) => (
-                                        <MenuItem
-                                        key={index}
-                                        value={name}
+                        {
+                            /*
+                            <FormControl sx={{ marginTop: '25px', paddingBottom: '25px'}}>
+                                        <InputLabel id="demo-select-small-label">Lado</InputLabel>
+                                        <Select
+                                        sx={{height:'50px'}}
+                                        labelId="demo-select-small-label"
+                                        id="demo-select-small"
+                                        value={lado}
+                                        onChange={handleChangeLado}
+                                        MenuProps={MenuProps}
+                                        style={{width: '200px'}}
                                         >
-                                        {name}
-                                        </MenuItem>
-                                    ))}
-                                    </Select>    
-                        </FormControl>
+                                        {lados.map((name, index) => (
+                                            <MenuItem
+                                            key={index}
+                                            value={name}
+                                            >
+                                            {name}
+                                            </MenuItem>
+                                        ))}
+                                        </Select>    
+                            </FormControl>
+                            
+                            */
+                        }
                     </Grid>
                     <Grid item xs={2}>
                         <FormControl sx={{paddingBottom: '25px'}}>

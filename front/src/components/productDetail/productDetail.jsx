@@ -13,6 +13,10 @@ import ArrowLeftRoundedIcon from '@mui/icons-material/ArrowLeftRounded';
 import ArrowRightRoundedIcon from '@mui/icons-material/ArrowRightRounded';
 import NavBar from "../navbar/navBar";
 
+
+const URL = import.meta.env.VITE_BACKEND_URL
+
+
 export default function PorductDetail() {
     const {
         alert, view,
@@ -81,6 +85,8 @@ export default function PorductDetail() {
         }
         )      
         console.log(view);
+        console.log(producto);
+        
           
     }, [])
 
@@ -115,15 +121,15 @@ export default function PorductDetail() {
                                                 color: 'white',
                                                 display: 'inline-block',
                                                 backgroundColor: '#035584',  
-                                                border: 'solid 0px',
+                                                border: 'solid 1px',
                                                 marginBottom: '5px',
-                                                height: '30px',
+                                                height: '35px',
         
                                                 }} >
                                                 <input  
                                                         style={{
                                                             position: 'relative',
-                                                            opacity: 0.7,
+                                                            opacity: 0.9,
                                                             height: '50px',
                                                             padding: '5px',
                                                         }}
@@ -133,23 +139,29 @@ export default function PorductDetail() {
                                                         placeholder="ingresa imagen"
                                                     />
                                             </Box>
-                                            <Button type="submit" size="small" color="success" variant="contained" sx={{ width: '170px' }} endIcon={<BackupRoundedIcon/>} 
+                                            <Button type="submit" size="large" color="info" variant="contained" endIcon={<BackupRoundedIcon/>} 
                                                 onClick={ async ()=>{
-                                                    setLoad(true)
-                                                    const res1 = await addimgProduct(producto.IdGenerate, file)
-                                                    const res2 = await getProductoIms(producto.IdGenerate) 
-                                                    console.log(res1);
-                                                    console.log(res2);
-                                                    if(res1 && res2){
-                                                        setImgs(res2)
-                                                        setLoad(false)
-                                                        alert('success')
-                                                    }else{
+                                                    console.log(file);
+                                                    if (file == null) {
                                                         alert('error')
+                                                    }else{
+                                                        setLoad(true)
+                                                        const res1 = await addimgProduct(producto.IdGenerate, file)
+                                                        const res2 = await getProductoIms(producto.IdGenerate) 
+                                                        console.log(res1);
+                                                        console.log(res2);
+                                                        if(res1 && res2){
+                                                            setImgs(res2)
+                                                            setLoad(false)
+                                                            alert('success')
+                                                        }else{
+                                                            alert('error')
+
+                                                        }
                                                     }
                                                 }}
                                                 >
-                                                    update
+                                                    update img
                                             </Button>
                                     </div>  : <div>user</div> }
                                 </Box>
@@ -157,13 +169,17 @@ export default function PorductDetail() {
                         </Grid>
                         <Grid item xs={16} margin={1}  >
                             <Link to='/inicio' >
-                                <Button size="small" color="info" variant="contained" sx={{marginRight: '5px'}} >volver</Button>
-                            </Link>   
-                            {view == 'admin' ?  <Button size="small" color="info" variant="contained" sx={{marginLeft: '5px'}} onClick={ async ()=>{
+                                <Button size="small" color="info" variant="contained" >volver</Button>
+                            </Link>
+                            {view == 'view' ?  <Button size="small" color="secondary" variant="contained" sx={{marginLeft: '5px'}} onClick={ async ()=>{
+                                    router('/updateProduct')                                     
+                                }} >Modificar</Button> : <div></div>
+                            }   
+                            {view == 'view' ?  <Button size="small" color="error" variant="contained" sx={{marginLeft: '5px'}} onClick={ async ()=>{
                                     console.log(producto.id);
                                     let res = await deleteProducto(producto.id)
                                     console.log(res);
-                                    res.ok ? (alert('success'), router('/inicio') ) : alert('error')
+                                    res.ok ? (await alert('success'), router('/inicio') ) : alert('error')
                                     
                                 }} >eliminar</Button> : <div></div>
                             }
@@ -173,7 +189,7 @@ export default function PorductDetail() {
                         <Grid item xs={16}>
                             <CardMedia
                                 sx={{ display: 'flex', margin: 'auto' ,height: 250, width: 200 }}
-                                image={`http://localhost:8080/static/${imgs[num].url}`}
+                                image={`http://${URL}/static/${imgs[num].url}`}
                                 title="green iguana"
                             />
                         </Grid>

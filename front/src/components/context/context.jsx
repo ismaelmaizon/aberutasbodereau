@@ -89,7 +89,6 @@ const CartProvider = ( { children } ) => {
         return response          
     }
   }
-
   //obtener tipos
   const [tipos, setTipos] = useState([])
   const getTipos = async () =>{
@@ -118,6 +117,7 @@ const CartProvider = ( { children } ) => {
         return response          
       }
   }
+
   //crear nuevo lugar
   const createLugar = async (data) =>{
     let lugar = {
@@ -350,6 +350,53 @@ const CartProvider = ( { children } ) => {
       return response 
     }
   }
+  //actualizar producto
+  const actualizarProducto = async ( data ) =>{
+    let prod = {
+      IdGenerate: data.IdGenerate,
+      Tipo: data.Tipo,
+      Alto: data.Alto,
+      Ancho: data.Ancho,
+      Derc: '',
+      Izq: '',
+      Precio_U: data.Precio_U}
+    if (data.Lado == 'Derc'){
+      prod.Derc = 1
+      prod.Izq = 0
+    }else{
+      prod.Derc = 0
+      prod.Izq = 1
+    }  
+    console.log(data);
+    console.log(prod);
+    
+    try {
+      
+      const response = await fetch(`http://${URL}/api/productos/updateProduct`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(prod), 
+        credentials: 'include'
+      });
+      // Manejo de respuestas no autorizadas
+      if (response.status === 401) {
+        console.error('Error 401: No autorizado. Verifica tus credenciales o sesión.');
+        // Aquí puedes redirigir al usuario a la página de login o mostrar un mensaje de error
+        return { status: 401, message: 'No autorizado' };
+      }
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      setVprod(false)
+      return response
+    } catch (error) {
+      let response = { status: 500 }
+      console.error('problemas con la consulta:', error);
+      return response 
+    }
+  }
   //agregar imagen a producto
   const addimgProduct = async ( id, file ) =>{
     console.log(id);
@@ -427,7 +474,7 @@ const CartProvider = ( { children } ) => {
         throw new Error('Network response was not ok');
       }
       console.log(response);
-      
+      setVprod(false)
       return response
     } catch (error) {
       let response = { status: 500 }
@@ -435,7 +482,6 @@ const CartProvider = ( { children } ) => {
       return response  
     }
   }
-
   //añadir producto a un lugar
   const insertProdLug = async (data) => {
     const {Idg, stock, Lugar} =  data
@@ -467,7 +513,6 @@ const CartProvider = ( { children } ) => {
       return response  
     }
   }
-
   //actulizar producto en un lugar
   const updateproductolugar = async (data) => {
     const {Idg, stock, Lugar, procedimiento} =  data
@@ -504,7 +549,6 @@ const CartProvider = ( { children } ) => {
       return response  
     }
   }
-
   //actualizar stock del producto
   const updateStockProduct = async (id) =>{
     try {
@@ -535,11 +579,26 @@ const CartProvider = ( { children } ) => {
   // Filtro productos
   // rows (filas de la tabla) 
   const [rows, setRows] = useState([])
-  const filtrarTipoLadoLug = async (tipo, lado, lug) => {
+  const filtrarTipoLadoLug = async (tipo, lado, lug, descr) => {
+    
+    if (descr != '' ) {
+      console.log(descr);
+      tipos.map((ti)=>{
+        console.log(ti.Descripcion);
+        console.log(descr);
+        if(ti.Descripcion === descr){
+          tipo = ti.id
+          console.log(tipo);
+          
+        }
+      })
+      console.log(tipo);
+    }
+
     setRows([]);
     let prods = [];
     
-    const addProduct = (prod) => {
+    const addProduct = (prod) => {      
         tipos.map((ti)=>{
           if (prod.Tipo == ti.id) {
             prods.push({
@@ -605,10 +664,13 @@ const CartProvider = ( { children } ) => {
         });
     };
 
-
+    
+      
     if (lug && !tipo && !lado) {
-        await filterByLugar(lug);
+      await filterByLugar(lug);
     } else if (tipo && !lado && !lug) {
+      console.log(tipo);
+      
         filterByTipo();
     } else if (lado && !tipo && !lug) {
         filterByLado();
@@ -628,7 +690,7 @@ const CartProvider = ( { children } ) => {
         });
     }
 
-    return prods
+    return prods  
   };
   
   const [cart, setCart] = useState([])
@@ -697,7 +759,6 @@ const CartProvider = ( { children } ) => {
         return response
       }
   }
-
   //obtener venta
   const [idv, setIdv] = useState('')
   const [ventainf, setVentainf] = useState([])
@@ -732,7 +793,6 @@ const CartProvider = ( { children } ) => {
     }
       
   }
-
   //añadir producto a Venta
   const registrarProdsVenta = async (data) =>{
     console.log(data);
@@ -761,7 +821,6 @@ const CartProvider = ( { children } ) => {
       return response
     }
   }
-
   //update de venta
   const updateVenta = async ( data, cart ) =>{
 
@@ -769,7 +828,7 @@ const CartProvider = ( { children } ) => {
       "venta" : {
         apellido: data.apellido,
         nombre: data.nombre,
-        mail: data.mail,
+        email: data.email,
         fecha: data.fecha,
         id_venta: data.id_venta,
         cel: data.cel,
@@ -851,6 +910,7 @@ const CartProvider = ( { children } ) => {
   const [lug, setLug] = useState('')
   const [lado, setLado] = useState('')
   const [tipo, setTipo] = useState('')
+  const [descr, setDescr] = useState('')
   const [ubi, setUbi] = useState(false)
 
   const refresh = () =>{
@@ -861,6 +921,7 @@ const CartProvider = ( { children } ) => {
       setTipo('')
       setLado('')
       setLug('')
+      setDescr('')
       let prods = []
       productos.map((prod)=>{ 
           //console.log(prod.id);
@@ -1017,7 +1078,7 @@ const CartProvider = ( { children } ) => {
 
         vprod, setVprod, vent, setVent,
         
-        createProducto, deleteProducto, addimgProduct,
+        createProducto, actualizarProducto, deleteProducto, addimgProduct,
         productos, setProductos, getProductos,
         producto, setProducto, getProducto, idg, setIdg,
         getProductoIms, imgs, setImgs,
@@ -1029,7 +1090,7 @@ const CartProvider = ( { children } ) => {
         
         createLugar,
         getLugares, lugares, setLugares,
-        lug, setLug, lado, setLado, tipo, setTipo, ubi, setUbi,
+        lug, setLug, lado, setLado, tipo, setTipo, ubi, setUbi, descr, setDescr,
         insertProdLug, updateproductolugar,
 
         registrarVenta, registrarProdsVenta, venta, setVenta, 

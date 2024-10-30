@@ -103,7 +103,7 @@ export const modVenta = async (req, res) =>{
     console.log('admin');
     const query = `
     UPDATE ventas
-    SET nombre = ?, apellido = ?, mail = ?, cel = ?, estado = ?, total = ?
+    SET nombre = ?, apellido = ?, email = ?, cel = ?, estado = ?, total = ?
     WHERE id_venta = ?
     `;
     console.log(req.body);
@@ -111,7 +111,7 @@ export const modVenta = async (req, res) =>{
     
     try {
         const [rows] = await pool.query(query,[
-          venta.nombre, venta.apellido, venta.mail, venta.cel, venta.estado, venta.total, venta.id_venta]
+          venta.nombre, venta.apellido, venta.email, venta.cel, venta.estado, venta.total, venta.id_venta]
         );
 
         if (rows) {

@@ -6,6 +6,7 @@ import {
   getProducto,
   getProductoIms,
   getProductos,
+  updateProducto,
 } from "../controllers/productos.controller.js";
 import __dirname  from '../utils.js'
 import multer from 'multer';
@@ -41,6 +42,8 @@ router.get("/productoimg/:idg", getProductoIms);
 router.post("/producto", upload.single('file') , createProducto);
 // INSERT imagen a producto
 router.post("/addimgProduct", upload.single('file') , addImgProducto);
+//update producto
+router.post("/updateProduct", updateProducto);
 // DELETE un producto
 router.delete("/producto/:id", deleteProducto);
 
